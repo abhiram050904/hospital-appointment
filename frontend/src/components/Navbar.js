@@ -13,21 +13,24 @@ const Navbar = () => {
 
       {/* Navigation Links */}
       <ul className="hidden md:flex items-start gap-5 font-medium">
-        <NavLink to="/" className="py-1">
-          HOME
+        <NavLink to="/">
+         <li className='py-1'>HOME</li>
+         <hr className='border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden' />
         </NavLink>
-        <NavLink to="/doctors" className="py-1">
-          ALL DOCTORS
+        <NavLink to="/doctors">
+        <li className='py-1'>ALL DOCTORS</li>
+        <hr className='border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden' />
         </NavLink>
-        <NavLink to="/about" className="py-1">
-          ABOUT
+        <NavLink to="/about">
+        <li className='py-1'>ABOUT</li>
+        <hr className='border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden' />
         </NavLink>
-        <NavLink to="/contact" className="py-1">
-          CONTACT
+        <NavLink to="/contact">
+        <li className='py-1'>CONTACT</li>
+        <hr className='border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden' />
         </NavLink>
       </ul>
 
-      {/* Profile or Create Account Button */}
       <div className="flex items-center gap-4">
         {
             token ? (
@@ -40,7 +43,7 @@ const Navbar = () => {
                 <div className='min-w-48 bg-stone-100 rounded flex flex-col gap-4 p-4'>
                 <p onClick={()=>navigate('profile')} className="p-2 hover:text-black hover:text-lg hover:font-semibold cursor-pointer">My Profile</p>
                 <p onClick={()=>navigate('my-appointments')} className="p-2 hover:text-black hover:text-lg hover:font-semibold cursor-pointer">My Appointments</p>
-                <p onClick={()=>navigate()} className="p-2 hover:text-black hover:text-lg hover:font-semibold cursor-pointer">Log Out</p>
+                <p onClick={()=>setToken(false)} className="p-2 hover:text-black hover:text-lg hover:font-semibold cursor-pointer">Log Out</p>
                 </div>
             </div>
 
