@@ -61,3 +61,4 @@ const RelatedDoctors = ({ docId, speciality }) => {
 };
 
 export default RelatedDoctors;
+
