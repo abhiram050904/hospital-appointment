@@ -2,14 +2,14 @@ import jwt from 'jsonwebtoken';
 
 const authAdmin = async (req, res, next) => {
     try {
-        const { temptoken } = req.headers;
+        const { atoken } = req.headers;
 
-        console.log(temptoken)
-        if (!temptoken) {
+        console.log(atoken)
+        if (!atoken) {
             return res.status(401).json({ success: false, message: 'Not authorized, please login again' });
         }
 
-        const tokenDecoded = jwt.verify(temptoken, process.env.JWT_SECRET);
+        const tokenDecoded = jwt.verify(atoken, process.env.JWT_SECRET);
 
         console.log(tokenDecoded)
 
