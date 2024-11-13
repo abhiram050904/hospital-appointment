@@ -3,12 +3,15 @@ import cors from 'cors';
 import 'dotenv/config';
 import mongoose from 'mongoose';
 import { v2 as cloudinary } from 'cloudinary';
+import adminRouter from './routers/AdminRoute.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
+
+app.use('/api/admin',adminRouter)
 
 const connectDb = async () => {
   try {

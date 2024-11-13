@@ -46,7 +46,7 @@ const doctorSchema=new mongoose.Schema({
     available:
     {
         type:Boolean,
-        required:true
+        default:true
     },
     fees:
     {
@@ -66,7 +66,7 @@ const doctorSchema=new mongoose.Schema({
     slots_booked:
     {
         type:Object,
-        required:true
+        default:{}
     },
 },{minimize:false})
 
