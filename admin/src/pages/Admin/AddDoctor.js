@@ -3,7 +3,6 @@ import { assets } from "../../assets/assets";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { AdminContext } from "../../context/AdminContext";
-import { doctors } from "../../assets2/assets";
 const AddDoctor = () => {
   const [doctorName, setDoctorName] = useState("");
   const [doctorEmail, setDoctorEmail] = useState("");
