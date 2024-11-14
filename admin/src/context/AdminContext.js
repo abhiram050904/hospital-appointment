@@ -3,7 +3,7 @@ import { createContext, useState } from "react";
 export const AdminContext = createContext();
 
 const AdminContextProvider = (props) => {
-    const [aToken, setAToken] = useState('');
+    const [aToken, setAToken] = useState(localStorage.getItem('aToken') ? localStorage.getItem('aToken') : '');
 
     const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
 
