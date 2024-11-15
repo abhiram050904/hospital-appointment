@@ -49,7 +49,7 @@ const USerSchema=new mongoose.Schema({
 },{minimize:false})
 
 
-const UserModel=mongoose.model('User',UserSchema)
+const UserModel=mongoose.model('User',USerSchema)
 
 
 export default UserModel
