@@ -82,5 +82,23 @@ const allDoctors=async(req,res)=>{
     }
 }
 
-export { addDoctor,LoginAdmin,allDoctors };
+const changeAvailability=async(req,res)=>{
+    try{
+
+        const {docdata}=req.body
+
+        const doctId=docdata._id;
+         const doctData=await doctorModel.findById(doctId)
+         console.log(doctData)
+         await doctorModel.findByIdAndUpdate(doctId,{available:!doctData.available})
+        res.json({success:true,message:`Availability changed`})
+    }
+    catch(err)
+    {
+            console.log(err)
+            res.json({success:false,message:err.message})
+    }
+}
+
+export { addDoctor,LoginAdmin,allDoctors,changeAvailability };
 
