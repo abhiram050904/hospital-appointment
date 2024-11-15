@@ -6,20 +6,19 @@ import { Appcontext } from '../context/Appcontext';
 const Navbar = () => {
   const navigate = useNavigate();
   const [showMenu, setShowMenu] = useState(false);
-  const { token, setToken } = useContext(Appcontext);
+  const { token, setToken,userData } = useContext(Appcontext);
 
-  // Check if a token exists in localStorage on component mount
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
     if (storedToken) {
-      setToken(storedToken); // Set token from localStorage into AppContext
+      setToken(storedToken); 
     }
   }, [setToken]);
 
   const logOut = () => {
-    setToken(null); // Use null or appropriate value to reset token
+    setToken(null);
     localStorage.removeItem('token');
-    navigate('/login'); // Navigate to login page after logout
+    navigate('/login'); 
   };
 
   return (
@@ -42,9 +41,9 @@ const Navbar = () => {
       </ul>
 
       <div className="flex items-center gap-4">
-        {token ? (
+        {token && userData ? (
           <div className="flex items-center gap-2 cursor-pointer group relative">
-            <img className="w-8 rounded-full" src={assets.profile_pic} alt="Profile" />
+            <img className="w-8 rounded-full" src={userData.image} alt="Profile" />
             <img className="w-2.5" src={assets.dropdown_icon} alt="Dropdown Icon" />
 
             <div className="absolute top-0 right-0 pt-14 text-base font-medium text-gray-600 z-20 hidden group-hover:block">
