@@ -184,8 +184,66 @@ const bookAppointment=async(req,res)=>{
 }
 
 
-const listAppointment=async(req,res)=>{
-  
-}
+const listAppointment = async (req, res) => {
+  try {
+    const { userId } = req.body;
 
-export { RegisterUser, LoginUser, getUserData, updateProfile,bookAppointment };
+    if (!userId) {
+      return res.status(400).json({ success: false, message: "User ID is required" });
+    }
+
+    const appointments = await appointmentModel.find({ userId });
+    const docData=doctorModel.findById(appointments.docId)
+    res.json({ success: true, appointments });
+  } catch (err) {
+    console.error("Error in listAppointment:", err);
+    res.status(500).json({ success: false, message: "Server error, please try again" });
+  }
+};
+
+
+const cancelAppointment = async (req, res) => {
+  try {
+    const { appointmentId, userId } = req.body;
+
+    if (!appointmentId || !userId) {
+      return res.status(400).json({ success: false, message: "All fields are required" });
+    }
+
+    const appointment = await appointmentModel.findById(appointmentId);
+    if (!appointment) {
+      return res.status(404).json({ success: false, message: "Appointment not found" });
+    }
+
+    if (appointment.userId.toString() !== userId) {
+      return res.status(403).json({ success: false, message: "You are not authorized to cancel this appointment" });
+    }
+
+    const doctor = await doctorModel.findById(appointment.docId);
+    if (!doctor) {
+      return res.status(404).json({ success: false, message: "Doctor not found" });
+    }
+
+    let slots_booked = doctor.slots_booked;
+    const { slotDate, slotTime } = appointment;
+
+    if (slots_booked[slotDate]) {
+      slots_booked[slotDate] = slots_booked[slotDate].filter(time => time !== slotTime);
+    }
+
+    await doctorModel.findByIdAndUpdate(appointment.docId, { slots_booked });
+
+    appointment.cancelled =true;
+    await appointment.save();
+    console.log('appointment canceled')
+
+    res.json({ success: true, message: "Appointment canceled successfully" });
+  } catch (err) {
+    console.error("Error in cancelAppointment:", err);
+    res.status(500).json({ success: false, message: "Server error, please try again" });
+  }
+};
+
+
+
+export { RegisterUser, LoginUser, getUserData, updateProfile,bookAppointment,listAppointment ,cancelAppointment};
