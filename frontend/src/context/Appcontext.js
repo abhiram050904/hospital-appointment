@@ -18,6 +18,7 @@ const AppcontextProvider = (props) => {
     gender: '',
     dob: ''
   });
+  const [getDoctorsData,setDoctorData]=useState('')
   const [token, setToken] = useState(localStorage.getItem('token') || '');
   const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
 
@@ -119,7 +120,8 @@ const AppcontextProvider = (props) => {
     setUserData,
     loadUserProfileData,
     handleLogin,
-    handleLogout
+    handleLogout,
+    getDoctorsData
   };
 
   return (

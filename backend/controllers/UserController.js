@@ -3,6 +3,9 @@ import validator from "validator";
 import User from "../models/UserModel.js";
 import jwt from "jsonwebtoken";
 import { v2 as cloudinary } from 'cloudinary';
+import doctorModel from "../models/doctorModel.js";
+import UserModel from "../models/UserModel.js";
+import appointmentModel from "../models/AppointmentModel.js";
 
 const RegisterUser = async (req, res) => {
   try {
@@ -124,4 +127,65 @@ const updateProfile = async (req, res) => {
   }
 };
 
-export { RegisterUser, LoginUser, getUserData, updateProfile };
+
+
+const bookAppointment=async(req,res)=>{
+  try{
+
+    const {userId,docId,slotDate,slotTime}=req.body
+
+    const docData=await doctorModel.findById(docId).select('-password')
+
+    if(!docData.available)
+    {
+      return res.json({success:false,message:'doctor not available'})
+    }
+
+    let slots_booked=docData.slots_booked
+
+    if(slots_booked[slotDate]){
+      if(slots_booked[slotDate].includes(slotTime)){
+        return res.json({success:false,message:'slot not available'})
+      }
+      else{
+        slots_booked[slotDate].push(slotTime)
+      }
+    }
+    else{
+      slots_booked[slotDate]=[]
+      slots_booked[slotDate].push(slotTime)
+    }
+
+
+    const userData=await UserModel.findById(userId).select('-password')
+
+    delete docData.slots_booked
+
+
+    const appointmentData={
+      userId,docId,userData,docData,amount:docData.fees,slotDate,slotTime,date:Date.now()
+    }
+
+    const newappointment=new appointmentModel(appointmentData)
+
+    const dataaa=await newappointment.save()
+
+    console.log(dataaa)
+    await doctorModel.findByIdAndUpdate(docId,{slots_booked})
+
+    res.json({success:true,message:"appointment booked"})
+
+  }
+  catch(err)
+  {
+    console.log(err)
+    res.json({success:false,message:err.message})
+  }
+}
+
+
+const listAppointment=async(req,res)=>{
+  
+}
+
+export { RegisterUser, LoginUser, getUserData, updateProfile,bookAppointment };
