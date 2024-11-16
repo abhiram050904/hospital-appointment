@@ -6,6 +6,8 @@ import { v2 as cloudinary } from 'cloudinary';
 import doctorModel from "../models/doctorModel.js";
 import UserModel from "../models/UserModel.js";
 import appointmentModel from "../models/AppointmentModel.js";
+import Razorpay from "razorpay";
+import crypto from "crypto";
 
 const RegisterUser = async (req, res) => {
   try {
@@ -243,6 +245,8 @@ const cancelAppointment = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error, please try again" });
   }
 };
+
+
 
 
 

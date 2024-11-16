@@ -7,6 +7,8 @@ export const AdminContext = createContext();
 const AdminContextProvider = (props) => {
   const [aToken, setAToken] = useState(localStorage.getItem("aToken") || "");
   const [doctors, setDoctors] = useState([]);
+  const [appointments,setAppointments]=useState([])
+  const [adminData,setAdminData]=useState([])
 
   const backendUrl =
     process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
@@ -49,6 +51,68 @@ const AdminContextProvider = (props) => {
     }
   }
 
+
+  const getAppointments = async () => {
+    try {
+      const { data } = await axios.get(
+        `${backendUrl}/api/admin/all-appointments`,
+        { headers: {aToken } }
+      );
+
+      if (data.success) {
+        setAppointments(data.appointments);
+        console.log(data);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (err) {
+      console.error("Error fetching appointments:", err);
+      toast.error(err.message);
+    }
+  };
+
+
+  const cancelAppointment=async(appointmentId)=>{
+
+    try {
+      const { data } = await axios.post(
+        `${backendUrl}/api/admin/delete-appointment`,{appointmentId},
+        { headers: {aToken } }
+      );
+
+      if (data.success) {
+        setAppointments(data.appointments);
+        console.log(data);
+        toast.success(data.message)
+      } else {
+        toast.error(data.message);
+      }
+    } 
+    catch (err) {
+      console.error("Error fetching appointments:", err);
+      toast.error(err.message);
+    }
+  }
+
+
+  const getDashData = async () => {
+    try {
+      const { data } = await axios.get(`${backendUrl}/api/admin/all-data`, {
+        headers: { aToken },
+      });
+  
+      if (data.success) {
+        console.log(data);
+        setAdminData(data.dashData)
+      } else {
+        toast.error("Failed to fetch dashboard data.");
+      }
+    } catch (err) {
+      console.error("Error fetching dashboard data:", err);
+      toast.error("An error occurred while fetching dashboard data.");
+    }
+  };
+  
   const value = {
     aToken,
     setAToken,
@@ -56,6 +120,11 @@ const AdminContextProvider = (props) => {
     doctors,
     getAllDoctors,
     changeAvailability,
+    appointments,setAppointments,
+    getAppointments,
+    cancelAppointment,
+    adminData,
+    getDashData
   };
 
   return (

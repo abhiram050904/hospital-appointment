@@ -99,7 +99,7 @@ const Myappointments = () => {
               </div>
               <div className="flex flex-col justify-end gap-2">
                 {item.cancelled ? (
-                  <button className="text-sm mb-12 text-white bg-red-50
+                  <button className="text-sm mb-12 text-white bg-red-500
                   0 cursor-not-allowed py-2 px-2 rounded shadow-lg">
                     Appointment Cancelled
                   </button>

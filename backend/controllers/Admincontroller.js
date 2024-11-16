@@ -3,6 +3,8 @@ import bcrypt from 'bcrypt';
 import { v2 as cloudinary } from 'cloudinary';
 import doctorModel from '../models/doctorModel.js';
 import jwt from 'jsonwebtoken'
+import appointmentModel from "../models/AppointmentModel.js";
+import UserModel from "../models/UserModel.js";
 
 const addDoctor = async (req, res) => {
     try {
@@ -100,5 +102,83 @@ const changeAvailability=async(req,res)=>{
     }
 }
 
-export { addDoctor,LoginAdmin,allDoctors,changeAvailability };
+
+const appointmentAdmin=async(req,res)=>{
+    try{
+
+        const appointments=await appointmentModel.find({})
+        res.json({success:true,appointments})
+    }
+    catch(err){ 
+
+        console.log(err)
+        res.json({success:false,message:err.message})
+
+    }
+}
+
+const cancelAppointment = async (req, res) => {
+    try {
+        const { appointmentId } = req.body;
+
+        if (!appointmentId) {
+            return res.status(400).json({ success: false, message: "Appointment ID is required" });
+        }
+
+        const appointment = await appointmentModel.findById(appointmentId);
+        if (!appointment) {
+            return res.status(404).json({ success: false, message: "Appointment not found" });
+        }
+
+        // Find the doctor related to the appointment
+        const doctor = await doctorModel.findById(appointment.docId);
+        if (!doctor) {
+            return res.status(404).json({ success: false, message: "Doctor not found" });
+        }
+
+        // Remove the canceled appointment's slot from the doctor's booked slots
+        let slots_booked = doctor.slots_booked;
+        const { slotDate, slotTime } = appointment;
+
+        if (slots_booked[slotDate]) {
+            slots_booked[slotDate] = slots_booked[slotDate].filter(time => time !== slotTime);
+        }
+
+        // Update the doctor's available slots
+        await doctorModel.findByIdAndUpdate(appointment.docId, { slots_booked });
+
+        // Mark the appointment as canceled
+        appointment.cancelled = true;
+        await appointment.save();
+
+        res.json({ success: true, message: "Appointment canceled successfully" });
+    } catch (err) {
+        console.error("Error in cancelAppointment:", err);
+        res.status(500).json({ success: false, message: "Server error, please try again" });
+    }
+};
+
+
+const adminDashboard = async (req, res) => {
+    try {
+      const doctors = await doctorModel.find({});
+      const users = await UserModel.find({});
+      const appointments = await appointmentModel.find({}).sort({ date: -1 }).limit(5); // Sorting by date descending and limiting to 5 results
+  
+      const dashData = {
+        doctors: doctors.length,
+        appointments: appointments.length,
+        patients: users.length,
+        latestAppointments: appointments,
+      };
+  
+      res.json({ success: true, dashData });
+    } catch (err) {
+      console.error("Error in adminDashboard:", err);
+      res.status(500).json({ success: false, message: "Server error, please try again" });
+    }
+  };
+  
+
+export { addDoctor,LoginAdmin,allDoctors,changeAvailability, appointmentAdmin ,cancelAppointment,adminDashboard };
 
