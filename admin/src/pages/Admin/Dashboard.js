@@ -21,14 +21,14 @@ const calculateAge = (dob) => {
 };
 
 const Dashboard = () => {
-  const { adminData, getDashData, aToken, appointments = [], cancelAppointment, loading } =
+  const { adminData, getDashData, aToken, appointments, cancelAppointment, loading } =
     useContext(AdminContext);
 
   useEffect(() => {
     if (aToken) {
       getDashData();
     }
-  }, [aToken, getDashData]);
+  }, [aToken]);
 
   if (loading) {
     return <p>Loading appointments...</p>;

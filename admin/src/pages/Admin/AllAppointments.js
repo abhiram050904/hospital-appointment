@@ -27,7 +27,7 @@ const AllAppointments = () => {
     if (aToken) {
       getAppointments();
     }
-  }, [aToken, getAppointments]);
+  }, [aToken]);
 
   if (loading) {
     return <p>Loading appointments...</p>;
