@@ -9,20 +9,18 @@ const DoctorcontextProvider = (props) => {
 
   const [dToken, setDToken] = useState(localStorage.getItem("dToken") || "");
   const [appointments, setAppointments] = useState([]);
-  const [doctorProfile, setDoctorProfile] = useState(null);  // State for doctor profile
-  const [doctorStats, setDoctorStats] = useState(null);  // State for Doctor Dashboard data
+  const [doctorProfile, setDoctorProfile] = useState(null);
+  const [doctorStats, setDoctorStats] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [loadingStats, setLoadingStats] = useState(false); // State for loading doctor stats
-  const [loadingProfile, setLoadingProfile] = useState(false); // State for loading profile
+  const [loadingStats, setLoadingStats] = useState(false);
+  const [loadingProfile, setLoadingProfile] = useState(false);
 
-  // Function to fetch appointments
   const getAppointments = async () => {
     setLoading(true);
     try {
       const { data } = await axios.get(`${backendUrl}/api/doctor/all-appointments`, {
         headers: { dtoken: dToken },
       });
-
       if (data.success) {
         setAppointments(data.appointments.reverse());
         toast.success(data.message);
@@ -36,17 +34,14 @@ const DoctorcontextProvider = (props) => {
     }
   };
 
-  // Function to fetch doctor dashboard stats
   const getDoctorDashboard = async () => {
     setLoadingStats(true);
     try {
       const { data } = await axios.get(`${backendUrl}/api/doctor/doctor-dashboard`, {
         headers: { dtoken: dToken },
       });
-
       if (data.success) {
         setDoctorStats(data.dashData);
-        console.log(data);
       } else {
         toast.error(data.message || "Failed to fetch doctor dashboard");
       }
@@ -57,7 +52,6 @@ const DoctorcontextProvider = (props) => {
     }
   };
 
-  // Function to cancel an appointment
   const cancelAppointment = async (appointmentId) => {
     try {
       const { data } = await axios.post(
@@ -65,7 +59,6 @@ const DoctorcontextProvider = (props) => {
         { appointmentId },
         { headers: { dToken } }
       );
-
       if (data.success) {
         setAppointments((prevAppointments) =>
           prevAppointments.map((appointment) =>
@@ -83,7 +76,6 @@ const DoctorcontextProvider = (props) => {
     }
   };
 
-  // Function to mark an appointment as complete
   const markAppointmentComplete = async (appointmentId) => {
     try {
       const { data } = await axios.post(
@@ -91,7 +83,6 @@ const DoctorcontextProvider = (props) => {
         { appointmentId },
         { headers: { dToken } }
       );
-
       if (data.success) {
         setAppointments((prevAppointments) =>
           prevAppointments.map((appointment) =>
@@ -109,17 +100,14 @@ const DoctorcontextProvider = (props) => {
     }
   };
 
-  // Function to fetch the doctor profile
   const getDoctorProfile = async () => {
     setLoadingProfile(true);
     try {
       const { data } = await axios.get(`${backendUrl}/api/doctor/get-profile`, {
         headers: { dtoken: dToken },
       });
-
       if (data.success) {
         setDoctorProfile(data.doctor);
-        console.log(data)
         toast.success("Profile fetched successfully");
       } else {
         toast.error(data.message || "Failed to fetch doctor profile");
@@ -131,7 +119,6 @@ const DoctorcontextProvider = (props) => {
     }
   };
 
-  // Function to edit doctor profile
   const editDoctorProfile = async (updatedProfile) => {
     setLoading(true);
     try {
@@ -140,9 +127,8 @@ const DoctorcontextProvider = (props) => {
         updatedProfile,
         { headers: { dtoken: dToken } }
       );
-
       if (data.success) {
-        setDoctorProfile(data.doctor); // Update profile with the new data
+        setDoctorProfile(data.doctor);
         toast.success("Profile updated successfully");
       } else {
         toast.error(data.message || "Failed to update doctor profile");
@@ -154,7 +140,6 @@ const DoctorcontextProvider = (props) => {
     }
   };
 
-  // UseEffect to call getDoctorDashboard once on component mount
   useEffect(() => {
     if (dToken) {
       getDoctorDashboard();
@@ -162,7 +147,7 @@ const DoctorcontextProvider = (props) => {
     } else {
       toast.error("Doctor not authenticated");
     }
-  }, [dToken]); // Ensure this only runs when the dToken is set or changes
+  }, [dToken]);
 
   const value = {
     dToken,
@@ -183,11 +168,7 @@ const DoctorcontextProvider = (props) => {
     loadingProfile,
   };
 
-  return (
-    <doctorcontext.Provider value={value}>
-      {props.children}
-    </doctorcontext.Provider>
-  );
+  return <doctorcontext.Provider value={value}>{props.children}</doctorcontext.Provider>;
 };
 
 export default DoctorcontextProvider;
