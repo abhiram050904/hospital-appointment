@@ -143,7 +143,6 @@ const DoctorcontextProvider = (props) => {
   useEffect(() => {
     if (dToken) {
       getDoctorDashboard();
-      getDoctorProfile();
     } else {
       toast.error("Doctor not authenticated");
     }

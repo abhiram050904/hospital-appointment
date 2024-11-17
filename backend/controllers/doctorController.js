@@ -218,7 +218,7 @@ const getDoctorProfile = async (req, res) => {
     }
 
     // Find the doctor by their ID
-    const doctor = await doctorModel.findById(docId).select("-password -email");
+    const doctor = await doctorModel.findById(docId).select("-password");
 
     if (!doctor) {
       return res.status(404).json({ success: false, message: "Doctor not found" });
@@ -236,41 +236,19 @@ const getDoctorProfile = async (req, res) => {
 
 const editDoctorProfile = async (req, res) => {
   try {
-    const { docId } = req.params;  // Getting docId from URL params
-    const { name, email, password, image, speciality, degree, experience, about, available, fees, address, slots_booked } = req.body; // Fields to update
+    const { docId,fees,address,available,about} = req.body; // Fields to update
 
+    console.log('update doctor',req.body)
     if (!docId) {
       return res.status(400).json({ success: false, message: "Doctor ID is required" });
     }
 
-    // Validate the required fields (you can adjust this validation)
-    if (!name && !speciality && !degree && !experience && !about && !fees && !address) {
-      return res.status(400).json({ success: false, message: "At least one field to update is required" });
-    }
-
+    
     // Find the doctor by their ID
-    const doctor = await doctorModel.findById(docId);
-    if (!doctor) {
-      return res.status(404).json({ success: false, message: "Doctor not found" });
-    }
+     await doctorModel.findByIdAndUpdate(docId,{fees,address,available,about});
+  
 
-    // Update the doctor profile fields
-    if (name) doctor.name = name;
-    if (email) doctor.email = email; // Note: typically you might want to check if email already exists
-    if (password) doctor.password = password;  // Don't forget to hash the password before saving!
-    if (image) doctor.image = image;  // Assuming image is a URL or a file path
-    if (speciality) doctor.speciality = speciality;
-    if (degree) doctor.degree = degree;
-    if (experience) doctor.experience = experience;
-    if (about) doctor.about = about;
-    if (available !== undefined) doctor.available = available;  // Handle booleans correctly
-    if (fees) doctor.fees = fees;
-    if (address) doctor.address = address;  // If address is an object, ensure it matches the required format
-    if (slots_booked) doctor.slots_booked = slots_booked;  // If slots_booked is an object
-
-    // Save the updated doctor data
-    await doctor.save();
-
+     const doctor=await doctorModel.findById(docId).select('-password')
     res.json({
       success: true,
       message: "Doctor profile updated successfully",
