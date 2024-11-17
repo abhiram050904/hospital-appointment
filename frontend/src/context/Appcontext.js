@@ -40,6 +40,21 @@ const AppcontextProvider = (props) => {
     }
   };
 
+  const appointmentRazorpay=async(appointmentId)=>{
+
+    try{
+
+      const {data}=await axios.post(backendUrl+'/api/user//payment-razorpay',{appointmentId},{headers:{token}})
+
+      if(data.success){
+        console.log(data.order)
+      }
+    }
+    catch (err) {
+      toast.error(err.message);
+      console.error("Error fetching doctors:", err);
+    }
+  }
   const loadUserProfileData = async () => {
     try {
       setIsLoading(true);
@@ -109,7 +124,6 @@ const AppcontextProvider = (props) => {
       dob: ''
     });
   };
-
   const value = {
     doctors,
     Currency_symbol,
@@ -121,7 +135,8 @@ const AppcontextProvider = (props) => {
     loadUserProfileData,
     handleLogin,
     handleLogout,
-    getDoctorsData
+    getDoctorsData,
+    appointmentRazorpay
   };
 
   return (

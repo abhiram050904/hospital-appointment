@@ -21,8 +21,8 @@ const calculateAge = (dob) => {
 };
 
 const Dashboard = () => {
-  const { adminData, getDashData, aToken, appointments, cancelAppointment, loading } =
-    useContext(AdminContext);
+  const { adminData, getDashData, aToken, appointments = [], cancelAppointment, loading } =
+    useContext(AdminContext); // Default to an empty array if appointments is undefined.
 
   useEffect(() => {
     if (aToken) {
@@ -111,12 +111,18 @@ const Dashboard = () => {
                   className={`px-3 py-1 rounded ${
                     item.cancelled
                       ? "bg-gray-500 text-white cursor-not-allowed"
+                      : item.isCompleted
+                      ? "bg-green-500 text-white cursor-not-allowed"
                       : "bg-red-500 text-white hover:bg-red-600"
                   }`}
-                  disabled={item.cancelled}
-                  onClick={() => !item.cancelled && cancelAppointment(item._id)}
+                  disabled={item.cancelled || item.isCompleted}
+                  onClick={() => !item.cancelled && !item.isCompleted && cancelAppointment(item._id)}
                 >
-                  {item.cancelled ? "Cancelled" : "Cancel"}
+                  {item.cancelled
+                    ? "Cancelled"
+                    : item.isCompleted
+                    ? "Completed"
+                    : "Cancel"}
                 </button>
               </div>
             ))
@@ -128,5 +134,6 @@ const Dashboard = () => {
     </div>
   );
 };
+
 
 export default Dashboard;

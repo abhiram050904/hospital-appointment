@@ -2,12 +2,16 @@ import React, { useContext, useState, useEffect } from "react";
 import { Appcontext } from "../context/Appcontext";
 import axios from "axios";
 import { toast } from "react-toastify";
+import {useNavigate} from 'react-router-dom'
+
 
 const Myappointments = () => {
   const backendUrl = "http://localhost:5000";
-  const { token, userId } = useContext(Appcontext); // Assume userId is available
+  const { token, userId } = useContext(Appcontext);
   const [appointments, setAppointments] = useState([]);
+  const [loading, setLoading] = useState(true);
 
+  const navigate = useNavigate();
   const monthNames = [
     "",
     "January", "February", "March", "April", "May", "June", 
@@ -19,6 +23,47 @@ const Myappointments = () => {
     return dateArray[0] + " " + monthNames[dateArray[1]] + " " + dateArray[2];
   };
 
+  const initPay = (order) => {
+    const options = {
+      key: process.env.REACT_APP_RAZORPAY_KEY_ID,
+      amount: order.amount,
+      currency: order.currency,
+      name: 'Appointment Payment',
+      description: "Appointment Payment",
+      order_id: order.id,
+      receipt: order.receipt,
+      handler: async (response) => {
+        console.log(response);
+        try {
+          const { data } = await axios.post(backendUrl + '/api/user/verify-payment', response, { headers: { token } });
+          if (data.success) {
+            getUserAppointments();
+            navigate('/my-appointments');
+          }
+        } catch (err) {
+          console.log(err);
+          toast.error(err.message);
+        }
+      }
+    };
+
+    const rzp = new window.Razorpay(options);
+    rzp.open();
+  };
+
+  const appointmentRazorpay = async (appointmentId) => {
+    try {
+      const { data } = await axios.post(`${backendUrl}/api/user/payment`, { appointmentId }, { headers: { token } });
+
+      if (data.success) {
+        initPay(data.order);
+      }
+    } catch (err) {
+      toast.error(err.message);
+      console.error("Error initiating Razorpay:", err);
+    }
+  };
+
   const getUserAppointments = async () => {
     try {
       const { data } = await axios.post(
@@ -27,14 +72,15 @@ const Myappointments = () => {
         { headers: { token } }
       );
 
-      console.log(data.appointments);
-
       if (data.success) {
         setAppointments(data.appointments.reverse());
+        console.log(data.appointments.reverse());
       }
     } catch (err) {
       console.error("Error fetching appointments:", err);
       toast.error(err.message || "Failed to fetch appointments.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -68,7 +114,9 @@ const Myappointments = () => {
     <div className="max-w-lg mx-auto p-4">
       <h2 className="text-xl font-bold mb-4">My Appointments</h2>
       <div className="space-y-4">
-        {appointments.length > 0 ? (
+        {loading ? (
+          <div>Loading...</div>
+        ) : appointments.length > 0 ? (
           appointments.map((item, index) => (
             <div
               key={index}
@@ -98,16 +146,25 @@ const Myappointments = () => {
                 </p>
               </div>
               <div className="flex flex-col justify-end gap-2">
-                {item.cancelled ? (
-                  <button className="text-sm mb-12 text-white bg-red-500
-                  0 cursor-not-allowed py-2 px-2 rounded shadow-lg">
+                {item.isCompleted ? (
+                  <button className="text-sm text-white bg-blue-600 cursor-not-allowed py-2 rounded shadow-lg">
+                    Completed
+                  </button>
+                ) : item.cancelled ? (
+                  <button className="text-sm mb-12 text-white bg-red-500 cursor-not-allowed py-2 px-2 rounded shadow-lg">
                     Appointment Cancelled
                   </button>
                 ) : (
                   <>
-                    <button className="text-sm text-white bg-green-600 hover:bg-green-700 transition duration-300 ease-in-out py-2 rounded shadow-lg transform hover:scale-105">
-                      Pay Online
-                    </button>
+                    {item.payment ? (
+                      <button className="text-sm text-white bg-green-700 cursor-not-allowed py-2 rounded shadow-lg">
+                        Paid
+                      </button>
+                    ) : (
+                      <button onClick={() => appointmentRazorpay(item._id)} className="text-sm text-white bg-green-600 hover:bg-green-700 transition duration-300 ease-in-out py-2 rounded shadow-lg transform hover:scale-105">
+                        Pay Online
+                      </button>
+                    )}
                     <button
                       onClick={() => cancelAppointment(item._id)}
                       className="text-sm text-white bg-red-600 hover:bg-red-700 transition duration-300 ease-in-out py-2 px-2 rounded shadow-lg transform hover:scale-105"

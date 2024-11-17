@@ -33,6 +33,20 @@ const AllAppointments = () => {
     return <p>Loading appointments...</p>;
   }
 
+  const handleCancelAppointment = async (appointmentId) => {
+    try {
+      await cancelAppointment(appointmentId); // Assuming this makes the necessary API call and cancellation
+      // After cancellation, update the local state to reflect the change
+      const updatedAppointments = appointments.map((item) =>
+        item._id === appointmentId ? { ...item, cancelled: true } : item
+      );
+      // Set the updated appointments list to the state
+      getAppointments(updatedAppointments);
+    } catch (err) {
+      console.error("Error canceling appointment:", err);
+    }
+  };
+
   return (
     <div className="w-full max-w-6xl m-5">
       <p className="mb-3 text-lg font-medium">All Appointments</p>
@@ -74,20 +88,27 @@ const AllAppointments = () => {
                 <p>{item.docData?.name || "N/A"}</p>
               </div>
               <p>{item.amount ? `₹${item.amount}` : "N/A"}</p>
-              <button
-                className={`px-3 py-1 rounded ${
-                  item.cancelled
-                    ? "bg-gray-500 text-white cursor-not-allowed"
-                    : "bg-red-500 text-white hover:bg-red-600"
-                }`}
-                disabled={item.cancelled}
-                onClick={() =>
-                  !item.cancelled &&
-                  cancelAppointment(item._id)
-                }
-              >
-                {item.cancelled ? "Cancelled" : "Cancel"}
-              </button>
+              <div>
+                {item.isCompleted ? (
+                  <button className="px-3 py-1 rounded bg-green-500 text-white cursor-not-allowed">
+                    Completed
+                  </button>
+                ) : (
+                  <button
+                    className={`px-3 py-1 rounded ${
+                      item.cancelled
+                        ? "bg-gray-500 text-white cursor-not-allowed"
+                        : "bg-red-500 text-white hover:bg-red-600"
+                    }`}
+                    disabled={item.cancelled}
+                    onClick={() =>
+                      !item.cancelled && handleCancelAppointment(item._id)
+                    }
+                  >
+                    {item.cancelled ? "Cancelled" : "Cancel"}
+                  </button>
+                )}
+              </div>
             </div>
           ))
         ) : (
