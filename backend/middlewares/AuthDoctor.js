@@ -4,7 +4,7 @@ const authDoctor = async (req, res, next) => {
     try {
         const { dtoken } = req.headers;
 
-        console.log(token)
+        console.log(dtoken)
         if (!dtoken) {
             return res.status(401).json({ success: false, message: 'Not authorized, please login again' });
         }
@@ -13,7 +13,7 @@ const authDoctor = async (req, res, next) => {
 
         console.log(tokenDecoded)
 
-        req.body.userId=tokenDecoded.id
+        req.body.docId=tokenDecoded.id
         next();
     } catch (err) {
         console.log(err);
